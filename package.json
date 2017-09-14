@@ -1,0 +1,24 @@
+{
+  "name": "j-sql-node",
+  "version": "1.0.0",
+  "description": "A json interface to connect to mysql database in node js",
+  "main": "baseModel.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kpatel1989/j-sql-node.git"
+  },
+  "author": "Kartik Patel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kpatel1989/j-sql-node/issues"
+  },
+  "homepage": "https://github.com/kpatel1989/j-sql-node#readme",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "mysql": "^2.14.1",
+    "mysql-model": "0.0.2"
+  }
+}
