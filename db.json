@@ -1,0 +1,7 @@
+{
+	"host": "HOST",
+    "port": 3306,
+    "user": "USERNAME",
+    "database": "DEFAULT_DATABASE",
+    "ssl" : "SSL_IF_REQUIRED"
+}

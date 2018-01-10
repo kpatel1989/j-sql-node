@@ -56,7 +56,8 @@ module.exports.update = (params) => {
 			throw new Error(error);
 		} else {
 			console.log("Updating -", params);
-			var model = new Model({ tableName });
+			var model = new Model();
+			model.tableName = tableName;
 			model.set(data);
 			return new Promise((resolve, reject) => {
 				model.save(where, (err, response, fields) => {
@@ -66,7 +67,40 @@ module.exports.update = (params) => {
 						model.disconnect();
 					} else {
 						console.log("Record successfully updated in ", tableName);
-						resolve(response);
+						resolve(model.toJSON());
+						model.disconnect();
+					}
+				});
+			});
+		}
+	}).catch(error => {
+		console.log("Update failed -", error, params);
+		throw new Error(error);
+	})
+}
+
+module.exports.updateBulk = (params) => {
+	return connect().then(Model => {
+		var { tableName, data, where } = params;
+		if (!tableName || !data || !where) {
+			var error = "Invalid arguments passed. Required 'tableName' and 'data'";
+			console.log(error, params)
+			throw new Error(error);
+		} else {
+			console.log("Updating -", params);
+			where = buildWhere(where);
+			var model = new Model();
+			model.tableName = tableName;
+			model.set(data);
+			return new Promise((resolve, reject) => {
+				model.save(where, (err, response, fields) => {
+					if (err) {
+						console.log("Save Error -", err);
+						throw new Error(err);
+						model.disconnect();
+					} else {
+						console.log("Record successfully updated in ", tableName);
+						resolve(model.toJSON());
 						model.disconnect();
 					}
 				});
@@ -87,7 +121,8 @@ module.exports.delete = (params) => {
 			throw new Error(error);
 		} else {
 			console.log("Deleting -", params);
-			var model = new Model({ tableName });
+			var model = new Model();
+			model.tableName = tableName;
 			return new Promise((resolve, reject) => {
 				model.remove(where, (err, response, fields) => {
 					if (err) {
@@ -110,7 +145,7 @@ module.exports.delete = (params) => {
 
 module.exports.get = (params) => {
 	return connect().then(Model => {
-		var { tableName, where = [] } = params;
+		var { tableName, where } = params;
 		if (!tableName) {
 			var error = "Invalid arguments passed. Required 'tableName'";
 			console.log(error, params)
@@ -171,24 +206,55 @@ module.exports.query = (params) => {
 	});
 }
 
+var buildWhere = function(where) {
+	var whereClause = "";
+	if (Array.isArray(where)) {
+		whereClause = where.map(function (wh, index) {
+			var operator = "=";
+			var operand = `'${wh.value}'`;
+			if (Array.isArray(wh.value)) {
+				operator = "IN";
+				operand = `(${wh.value.join(",")})`;
+			}
+			else if (typeof wh.value == "string") {
+				operand = `'${wh.value.toString()}'`;
+			}
+			wh.condition = wh.condition || " AND ";
+			if (index == 0) wh.condition = "";
+			return ` ${wh.condition} ${wh.columnName} ${operator} ${operand}`;
+		}, this).join(" ");
+	} else {
+		whereClause = Object.keys(where).map( key => {
+			var operator = " = ";
+			var value = where[key];
+			if (Array.isArray(where[key])) {
+				operator = " IN ";
+				value = `'${value.join(",")}'`;
+			}
+			return `${key} ${operator} ${value}`
+		}).join(" AND ");
+	}
+	return whereClause;
+}
+
 /**
 * 
 * @param {Array} columns Array of columns to return from the query or ["*"]
 * @param {String} tableName TableName to execute the query
 * @param {Array} joins Array of join querys to append to the query. 
 * 						Format : {
-	* 							type: "INNER JOIN" | "LEFT JOIN" | "RIGHT JOIN",
-	* 							to: tableName,
-	* 							on: keyCondition
-	* 						}
-	* @param {Array} where Array of all where condition
-	* 						Format : {
-		* 							columnName : columnName,
-		* 							value : 'Hello' | 123 | [1,2,3,4] | {SubQuery}
-		* 							condition : "AND" | "OR" | Optional (default is AND)
-		* 						}
-		*/
-var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, having, page, pageCount = 100 }) {
+* 							type: "INNER JOIN" | "LEFT JOIN" | "RIGHT JOIN",
+* 							to: tableName,
+* 							on: keyCondition
+* 						}
+* @param {Array} where Array of all where condition
+* 						Format : {
+* 	 							columnName : columnName,
+*	 							value : 'Hello' | 123 | [1,2,3,4] | {SubQuery}
+*	 							condition : "AND" | "OR" | Optional (default is AND)
+*	 						}
+*/
+var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, having, page, pageCount }) {
 	if (!tableName) {
 		throw new Error("Required atleast tableName");
 	}
@@ -200,16 +266,15 @@ var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, 
 		var joinQuery = joins.map(({ type, to, on }) => { return ` ${type} ${to} ON ${on} ` }).join(" ");
 		query += joinQuery;
 	}
-	if (where) {
+	if (where && where.length > 0) {
 		query += " Where " + where.map(function (wh, index) {
 			var operator = "=";
 			var operand = `'${wh.value}'`;
 			if (Array.isArray(wh.value)) {
 				operator = "IN";
-				operand = `(${operand.join(",")})`;
+				operand = `(${wh.value.join(",")})`;
 			}
 			else if (typeof wh.value == "string") {
-				operator = "LIKE";
 				operand = `'${wh.value.toString()}'`;
 			} else if (typeof wh.value == "object") {
 				operand = buildQuery(wh.value);
@@ -220,7 +285,7 @@ var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, 
 		}, this).join(" ");
 	}
 	if (groupBy) {
-		query += ` GROUP BY (${groupBy.join(",")})`;
+		query += ` GROUP BY ${groupBy.join(",")}`;
 	}
 	if (having) {
 		query += ` HAVING (${having.join(",")})`;
