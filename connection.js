@@ -272,7 +272,7 @@ var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, 
 			var operand = `'${wh.value}'`;
 			if (Array.isArray(wh.value)) {
 				operator = "IN";
-				operand = `(${wh.value.join(",")})`;
+				operand = `('${wh.value.join("','")}')`;
 			}
 			else if (typeof wh.value == "string") {
 				operand = `'${wh.value.toString()}'`;

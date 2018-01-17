@@ -20,3 +20,9 @@ V1.1.0 Release
 
  V1.1.1 Release
  - Change get params to query.
+
+V1.1.2 Release
+ - Bug fixes.
+
+ V1.1.3 Release
+ - Bug fixes.
