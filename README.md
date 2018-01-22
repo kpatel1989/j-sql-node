@@ -26,3 +26,11 @@ V1.1.2 Release
 
  V1.1.3 Release
  - Bug fixes.
+
+
+ V1.1.3 Release
+ - Bug fixes.
+
+
+ V1.1.3 Release
+ - Bug fixes. Use body and query keys from event object. 

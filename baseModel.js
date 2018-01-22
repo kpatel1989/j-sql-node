@@ -6,6 +6,7 @@ module.exports = function (tableName, idField) {
 		db,
 		insert: (event, context, callback) => {
 			console.log("Insert to:", tableName, event);
+			event = event.body;
 			var data = { tableName, data: event, idField };
 			db.insert(data).then(response => {
 				console.log("Response:", response);
@@ -17,8 +18,8 @@ module.exports = function (tableName, idField) {
 		},
 
 		update: (event, context, callback) => {
-			console.log("Update:", tableName);
-			var data = event;
+			console.log("Update:", tableName, event);
+			var data = event.body;;
 
 			var idParam = {
 				columnName: idField,
@@ -48,6 +49,7 @@ module.exports = function (tableName, idField) {
 
 		updateBulk: (event, context, callback) => {
 			console.log("Update:", tableName);
+			event = event.body;
 			var { data, where } = event;
 			if (!data || !where) {
 				callback("Invalid data. data or where keys missing");
@@ -70,6 +72,7 @@ module.exports = function (tableName, idField) {
 
 		delete: (event, context, callback) => {
 			console.log("Delete :", tableName);
+			event = event.body;
 			var where = Object.keys(event).map(key => {
 				return `${key} = '${event[key]}'`;
 			}).join(" and ");
@@ -104,6 +107,7 @@ module.exports = function (tableName, idField) {
 
 		query: (event, context, callback) => {
 			console.log("Query :", tableName);
+			event = event.body;
 			db.query(event).then(response => {
 				console.log("Response:", response);
 				callback(null, response);
