@@ -28,9 +28,12 @@ V1.1.2 Release
  - Bug fixes.
 
 
- V1.1.3 Release
+ V1.1.4 Release
  - Bug fixes.
 
 
- V1.1.3 Release
+ V1.1.5 Release
  - Bug fixes. Use body and query keys from event object. 
+
+ V1.1.6 Release
+ - Add tableName by default to query, Remove the need for query key
