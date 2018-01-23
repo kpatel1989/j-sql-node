@@ -275,6 +275,7 @@ var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, 
 				operand = `('${wh.value.join("','")}')`;
 			}
 			else if (typeof wh.value == "string") {
+				operator = "LIKE";
 				operand = `'${wh.value.toString()}'`;
 			} else if (typeof wh.value == "object") {
 				operand = buildQuery(wh.value);
