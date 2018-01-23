@@ -104,7 +104,8 @@ module.exports = function (tableName, idField) {
 
 		query: (event, context, callback) => {
 			console.log("Query :", tableName);
-			event.tableName = tableName;
+			if (!event.tableName)
+				event.tableName = tableName;
 			db.query({query: event}).then(response => {
 				console.log("Response:", response);
 				callback(null, response);
