@@ -295,7 +295,7 @@ var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, 
 		query += ` ORDER BY (${orderBy.join(",")})`;
 	}
 	if (pageCount && page) {
-		query += ` LIMIT ${(page - 1) * pageCount + 1}, ${pageCount}`;
+		query += ` LIMIT ${(page - 1) * pageCount}, ${pageCount}`;
 	} else if (pageCount) {
 		query += ` LIMIT ${pageCount}`;
 	}
