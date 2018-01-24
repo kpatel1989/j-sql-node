@@ -292,7 +292,7 @@ var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, 
 		query += ` HAVING (${having.join(",")})`;
 	}
 	if (orderBy) {
-		query += ` ORDER BY (${orderBy.join(",")})`;
+		query += ` ORDER BY ${orderBy.join(",")}`;
 	}
 	if (pageCount && page) {
 		query += ` LIMIT ${(page - 1) * pageCount}, ${pageCount}`;
