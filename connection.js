@@ -229,7 +229,9 @@ var buildWhere = function(where) {
 			var value = where[key];
 			if (Array.isArray(where[key])) {
 				operator = " IN ";
-				value = `'${value.join(",")}'`;
+				value = `('${value.join("','")}')`;
+			} else if (typeof value == "string") {
+				operand = `'${value.toString()}'`;
 			}
 			return `${key} ${operator} ${value}`
 		}).join(" AND ");
@@ -275,8 +277,14 @@ var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, 
 				operand = `('${wh.value.join("','")}')`;
 			}
 			else if (typeof wh.value == "string") {
-				operator = "LIKE";
-				operand = `'${wh.value.toString()}'`;
+				if (wh.value.toUpperCase() == "NULL" 
+				|| wh.value.toUpperCase() == "NOT NULL") {
+					operand = wh.value.toString();
+					operator = "IS";
+				} else {
+					operand = `'${wh.value.toString()}'`;
+					operator = "LIKE";
+				}
 			} else if (typeof wh.value == "object") {
 				operand = buildQuery(wh.value);
 			}
