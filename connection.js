@@ -210,10 +210,10 @@ var buildWhere = function(where) {
 	var whereClause = "";
 	if (Array.isArray(where)) {
 		whereClause = where.map(function (wh, index) {
-			var operator = "=";
+			var operator = wh.comparator || "=";
 			var operand = `'${wh.value}'`;
 			if (Array.isArray(wh.value)) {
-				operator = "IN";
+				operator = wh.comparator || "IN";
 				operand = `(${wh.value.join(",")})`;
 			}
 			else if (typeof wh.value == "string") {
@@ -270,20 +270,20 @@ var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, 
 	}
 	if (where && where.length > 0) {
 		query += " Where " + where.map(function (wh, index) {
-			var operator = "=";
+			var operator = wh.comparator || "=";
 			var operand = `'${wh.value}'`;
 			if (Array.isArray(wh.value)) {
-				operator = "IN";
+				operator = wh.comparator || "IN";
 				operand = `('${wh.value.join("','")}')`;
 			}
 			else if (typeof wh.value == "string") {
 				if (wh.value.toUpperCase() == "NULL" 
 				|| wh.value.toUpperCase() == "NOT NULL") {
 					operand = wh.value.toString();
-					operator = "IS";
+					operator = wh.comparator || "IS";
 				} else {
 					operand = `'${wh.value.toString()}'`;
-					operator = "LIKE";
+					operator = wh.comparator || "LIKE";
 				}
 			} else if (typeof wh.value == "object") {
 				operand = buildQuery(wh.value);
