@@ -227,13 +227,14 @@ var buildWhere = function(where) {
 		whereClause = Object.keys(where).map( key => {
 			var operator = " = ";
 			var value = where[key];
+			var operand = `'${value}'`;
 			if (Array.isArray(where[key])) {
 				operator = " IN ";
 				value = `('${value.join("','")}')`;
 			} else if (typeof value == "string") {
 				operand = `'${value.toString()}'`;
 			}
-			return `${key} ${operator} ${value}`
+			return `${key} ${operator} ${operand}`
 		}).join(" AND ");
 	}
 	return whereClause;

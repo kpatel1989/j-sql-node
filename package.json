@@ -1,6 +1,6 @@
 {
   "name": "j-sql-node",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "description": "A json interface to connect to mysql database in node js",
   "main": "baseModel.js",
   "scripts": {
