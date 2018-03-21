@@ -257,14 +257,14 @@ var buildWhere = function(where) {
 *	 							condition : "AND" | "OR" | Optional (default is AND)
 *	 						}
 */
-var buildQuery = function({ from, columns, tableName, joins, where, groupBy, orderBy, having, page, pageCount }) {
+var buildQuery = function({ columns, tableName, joins, where, groupBy, orderBy, having, page, pageCount }) {
 	if (!tableName) {
 		throw new Error("Required atleast tableName");
 	}
 
 	if (!columns) columns = ["*"];
 
-    var query = `SELECT ${columns.join(",")} FROM ${tableName}`;
+	var query = `SELECT ${columns.join(",")} FROM ${tableName}`;
 	if (joins) {
 		var joinQuery = joins.map(({ type, to, on }) => { return ` ${type} ${to} ON ${on} ` }).join(" ");
 		query += joinQuery;
